@@ -16,8 +16,9 @@ Image segmentation is considered to be a fundamental yet challenging problem in 
 
 A vast amount of research on this topic encompasses approaches including but not limited to edge detection based methods to get boundaries and segment the components. However, since the edges are often discontinuous or over-detected, they can only provide a candidate for the object boundaries. In this project, we formulate the image as a graph and solve a combinatorial optimization problem to obtain the segmented parts. Specifically, we try to divide an image into a region-based graph and apply dynamic merging over these regions to group regions from the same objects under the same label.
 
-<center><img src='./img/segment.JPG'></center>
-
+<p align='center'>
+    <img src='./img/segment.JPG'>
+</p>
 *__Figure__ : An example of the segmentation process. We see that the first image depicts the input RGB data in which we want to apply segmentation. The second figure (middle) shows the initial over-segmented state of the input image, and the final visualization shows the result of Dynamic Region Merging Algorithm on the image. The final image shows the different labels being well separated into different groups/partitions.*
 
 
@@ -40,65 +41,87 @@ Two regions in a graph are merged if:
  - they are consistent (also considered as the stopping criterion for the merging process).
 
 #### Dissimilarity:
-The dissimilarity between two regions $R_1,R_2$ are given by the minimum of weight $w$ of all the edges $E$ between the set of pixels $v_i \in V$ of the two regions.
-$$ S(R_1,R_2) = min_{v_i \in R_1,v_j \in R_2,(v_i,v_j) \in E} w((v_i,v_j))$$
+The dissimilarity between two regions ![R_1,R_2](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+R_1%2CR_2)
+ are given by the minimum of weight ![w](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+w)
+ of all the edges ![E](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+E)
+ between the set of pixels ![v_i \in V](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+v_i+%5Cin+V)
+ of the two regions.
+
+![\begin{equation}
+S(R_1,R_2) = min_{v_i \in R_1,v_j \in R_2,(v_i,v_j) \in E} w((v_i,v_j))
+\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AS%28R_1%2CR_2%29+%3D+min_%7Bv_i+%5Cin+R_1%2Cv_j+%5Cin+R_2%2C%28v_i%2Cv_j%29+%5Cin+E%7D+w%28%28v_i%2Cv_j%29%29%0A%5Cend%7Bequation%7D)
 
 The two regions in the neighborhood are said to be most similar if:
-$$ S(R_1,R_2) = min_{R_i \in \Omega_1} S(R_1,R_i) = min_{R_j \in \Omega_2} S(R_2,R_j)$$
-where $\Omega_1$ and $\Omega_2$ are the neighborhood sets of $R_1$ and $R_2$
+
+![\begin{equation}
+S(R_1,R_2) = min_{R_i \in \Omega_1} S(R_1,R_i) = min_{R_j \in \Omega_2} S(R_2,R_j)
+\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AS%28R_1%2CR_2%29+%3D+min_%7BR_i+%5Cin+%5COmega_1%7D+S%28R_1%2CR_i%29+%3D+min_%7BR_j+%5Cin+%5COmega_2%7D+S%28R_2%2CR_j%29%0A%5Cend%7Bequation%7D)
+
+where ![\Omega_1](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5COmega_1) and ![\Omega_2](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5COmega_2) are the neighborhood sets of ![R_1](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+R_1) and ![R_2](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+R_2)
 
 
 #### Consistency
-The consistency between the two regions is given by SPRT (Sequential Probability Ratio Test) [2]. First, the distribution of visual cues $P_0(x|\theta_0) , P_1(x|\theta_1)$ between two regions is obtained using the Gaussian distribution model.
+The consistency between the two regions is given by SPRT (Sequential Probability Ratio Test) [2]. First, the distribution of visual cues ![P_0(x|\theta_0) , P_1(x|\theta_1)](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+P_0%28x%7C%5Ctheta_0%29+%2C+P_1%28x%7C%5Ctheta_1%29) between two regions is obtained using the Gaussian distribution model.
 
-Then, the likelihood ratio $\delta_i$ is given by:
-$$\delta_i = \log \frac{P_0(x_i|\theta_0)}{P_1(x_i|\theta_1)}, i=1,2,...,N$$
+Then, the likelihood ratio ![\delta_i](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta_i) is given by:
 
-where $N$ is the number of tests. The overall likelihood $\delta$ is obtained by summing over the $\delta_i$.
+![\begin{equation}
+\delta_i = \log \frac{P_0(x_i|\theta_0)}{P_1(x_i|\theta_1)}, i=1,2,...,N
+\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0A%5Cdelta_i+%3D+%5Clog+%5Cfrac%7BP_0%28x_i%7C%5Ctheta_0%29%7D%7BP_1%28x_i%7C%5Ctheta_1%29%7D%2C+i%3D1%2C2%2C...%2CN%0A%5Cend%7Bequation%7D)
 
-If the delta exceeds the bounds or the number of tests are made, this $\delta$ value is used to predict the consistency between two regions.
+where _N_ is the number of tests. The overall likelihood ![\delta](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta) is obtained by summing over the ![\delta_i](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta_i).
+
+If the delta exceeds the bounds or the number of tests are made, this ![\delta](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta) value is used to predict the consistency between two regions.
 
 
 ### Dynamic Region Merging
 
 Region merging starts from an over-segmented image. Once the initial labels are obtained, the labels are updated every pass and a final label $l_i^n$ is obtained. We get a sequence of labels $(l_i^1, … , l_i^n)$ and multiple such sequence of labels are obtained because of the uncertainty in the SPRT. The optimal sequence is obtained by minimising the objective function F which is defined as the measure of transition costs in the space of partitions. F is the sum of transition costs over all regions, then,
-$$F = \sum_{R_i} F_i$$
+
+![\begin{equation}
+F = \sum_{R_i} F_i
+\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AF+%3D+%5Csum_%7BR_i%7D+F_i%0A%5Cend%7Bequation%7D)
+
 The solution is found using a DP approach as,
-\begin{equation}
-\begin{aligned}
-\text{min} F_i (l_i^0 , ... , l_i^n ) & =  \text{min}F_i (l_i^0 , l_i^{n − 1} ) + d_{n− 1, n}\\
-                                      & =  \text{min} F_i (l_i^0 , l_i^{n−2} ) + d_{n− 2,n − 1} + d_{n − 1, n}\\
+
+![\begin{aligned}
+\text{min} F_i (l_i^0 , ... , l_i^n ) & =  \text{min}F_i (l_i^0 , l_i^{n - 1} ) + d_{n - 1, n}\\
+                                      & =  \text{min} F_i (l_i^0 , l_i^{n-2} ) + d_{n- 2,n - 1} + d_{n - 1, n}\\
                                       & =  \text{...}\\
                                       & = \sum_{k=0}^{n-1} d_{k,k+1}
-\end{aligned}
-\end{equation}
+\end{aligned}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Baligned%7D%0A%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+...+%2C+l_i%5En+%29+%26+%3D++%5Ctext%7Bmin%7DF_i+%28l_i%5E0+%2C+l_i%5E%7Bn+-+1%7D+%29+%2B+d_%7Bn+-+1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+l_i%5E%7Bn-2%7D+%29+%2B+d_%7Bn-+2%2Cn+-+1%7D+%2B+d_%7Bn+-+1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7B...%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D+%5Csum_%7Bk%3D0%7D%5E%7Bn-1%7D+d_%7Bk%2Ck%2B1%7D%0A%5Cend%7Baligned%7D)
 
 From an earlier assumption, we conclude that,
-$$d_{k ,k +1} = \min_{R_{k+1} \epsilon \Omega_k} S ( R_k , R_{k +1} )$$
+
+![d_{k ,k +1} = \min_{R_{k+1} \epsilon \Omega_k} S ( R_k , R_{k +1} )](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+d_%7Bk+%2Ck+%2B1%7D+%3D+%5Cmin_%7BR_%7Bk%2B1%7D+%5Cepsilon+%5COmega_k%7D+S+%28+R_k+%2C+R_%7Bk+%2B1%7D+%29)
 
 The overall path length from $l_i^0$ to $l_i^n$ is the sum of minimum edges $d_{k,k+1}$ for each node in that path. This problem reduces to a search for a shortest path problem, whose solution can be found at a finite set of steps by the Dijkstra’s algorithm in polynomial time.
 
-<center><img src='./img/DRM.JPG'></center>
+<p align='center'>
+    <img src='./img/DRM.JPG'>
+</p>
 
 *__Figure__ : The dynamic region merging process as a shortest path in a layered graph. The upper row shows the label transitions of a graph node. The lower row shows the corresponding image regions of each label layer. Starting from layer 0, the highlighted region (in red) obtains a new label from its closest neighbor (in red). If the region is merged with its neighbor, they will be assigned to the same label. The shortest path is shown as the group of the directed edges (in blue).*
 
 ### Nearest Neighbour Graph based Accelaration
 
-The Dynamic Region Merging process depends on the adjacency relationship between two regions, and following the steps based on the previous points, we notice that at each merging step, an edge with a minimum weight in a certain neighbourhood is required. A linear search for such an edge takes $O(\|E\|)$ time, which in turn makes the overall process highly computation intensive.
+The Dynamic Region Merging process depends on the adjacency relationship between two regions, and following the steps based on the previous points, we notice that at each merging step, an edge with a minimum weight in a certain neighbourhood is required. A linear search for such an edge takes ![O(\|E\|)](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+O%28%5C%7CE%5C%7C%29) time, which in turn makes the overall process highly computation intensive.
 
-Based on the observation that only a small portion of RAG edges counts for the merging process, we can find an algorithm for accelerating the region merging. For a given RAG, where $G = <V, E>$, the Nearest Neighbour Graph (NGG) is defined as a directed graph $G_m = <V_m, E_m>$, with $V_m = V$. We then define a symmetric dissimilarity function $S$ to measure the edge weights, where the directed edge set $E_m$ is defined as:
+Based on the observation that only a small portion of RAG edges counts for the merging process, we can find an algorithm for accelerating the region merging. For a given RAG, where ![G = <V, E>](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+G+%3D+%3CV%2C+E%3E), the Nearest Neighbour Graph (NGG) is defined as a directed graph ![G_m = <V_m, E_m>](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+G_m+%3D+%3CV_m%2C+E_m%3E), with ![V_m = V](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+V_m+%3D+V). We then define a symmetric dissimilarity function __S__ to measure the edge weights, where the directed edge set ![E_m](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+E_m) is defined as:
 
-$$
-E_m = \{ (v_i, v_j) | w((v_i, v_j)) = min_k S(v_i, v_k), (v_i, v_k) \in E \}
-$$
 
-Based on the above formulation, we notice that the out-degree of each node is exactly one, and $\|E_m\| = \|V_m\|$ in the resulting NGG. So, for the graph we end up having cycles of length two for the compponents that satisfy the stopping criterion which we established with the region merging predicate $P$. This way, we can consider the algorithm to stop when the number of cycles becomes zero in the NNG.
+![E_m = \{ (v_i, v_j) | w((v_i, v_j)) = min_k S(v_i, v_k), (v_i, v_k) \in E \}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+E_m+%3D+%5C%7B+%28v_i%2C+v_j%29+%7C+w%28%28v_i%2C+v_j%29%29+%3D+min_k+S%28v_i%2C+v_k%29%2C+%28v_i%2C+v_k%29+%5Cin+E+%5C%7D)
 
-<center><img src='./img/NNG.JPG'></center>
+
+Based on the above formulation, we notice that the out-degree of each node is exactly one, and ![\|E_m\| = \|V_m\|](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5C%7CE_m%5C%7C+%3D+%5C%7CV_m%5C%7C) in the resulting NGG. So, for the graph we end up having cycles of length two for the compponents that satisfy the stopping criterion which we established with the region merging predicate __P__. This way, we can consider the algorithm to stop when the number of cycles becomes zero in the NNG.
+
+<p aligh="center">
+    <img src='./img/NNG.JPG'>
+</p>
 
 *__Figure__ : The image shows an example of how the modification appears in a Nearest Neighbour Graph derived from a RAG. We notice that the new cycle is generate between node 4 and node 5, which are in the second order neighbourhood of the nodes (1,2) which were merged together in the Dynamic Region Merging process.*
 
-The justification for this formulation is that, only using RAG requires $O(\|V\|)$ searching time for merging in each step. But in the NNG methods, after the nodes of the cycle are merged, the weights of RAG and the structure of NNG can be modified. There is also an observation that the new cycle can only form in the second-order neighbourhood of the merged nodes (as is also shown in the figure above). This way, the computation time for a merge of the NNG cycle is $O(\gamma^{(2)} + 1)$, where $\gamma^{(2)}$ is the size of the second order neighbourhood, which is significantly smaller than $\|V\|$. Hence, it can be shown that the number of computations will be significantly reduced by following this strategy.
+The justification for this formulation is that, only using RAG requires ![O(\|V\|)](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+O%28%5C%7CV%5C%7C%29) searching time for merging in each step. But in the NNG methods, after the nodes of the cycle are merged, the weights of RAG and the structure of NNG can be modified. There is also an observation that the new cycle can only form in the second-order neighbourhood of the merged nodes (as is also shown in the figure above). This way, the computation time for a merge of the NNG cycle is ![O(\gamma^{(2)} + 1)](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+O%28%5Cgamma%5E%7B%282%29%7D+%2B+1%29), where ![\gamma^{(2)}](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cgamma%5E%7B%282%29%7D) is the size of the second order neighbourhood, which is significantly smaller than ![\|V\|](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5C%7CV%5C%7C). Hence, it can be shown that the number of computations will be significantly reduced by following this strategy.
 
 ## Dataset
 

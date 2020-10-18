@@ -47,15 +47,17 @@ The dissimilarity between two regions ![R_1,R_2](https://render.githubuserconten
  between the set of pixels ![v_i \in V](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+v_i+%5Cin+V)
  of the two regions.
 
-![\begin{equation}
-S(R_1,R_2) = min_{v_i \in R_1,v_j \in R_2,(v_i,v_j) \in E} w((v_i,v_j))
-\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AS%28R_1%2CR_2%29+%3D+min_%7Bv_i+%5Cin+R_1%2Cv_j+%5Cin+R_2%2C%28v_i%2Cv_j%29+%5Cin+E%7D+w%28%28v_i%2Cv_j%29%29%0A%5Cend%7Bequation%7D)
+<p align='center'>
+<img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+S%28R_1%2CR_2%29+%3D+min_%7Bv_i+%5Cin+R_1%2Cv_j+%5Cin+R_2%2C%28v_i%2Cv_j%29+%5Cin+E%7D+w%28%28v_i%2Cv_j%29%29" 
+alt="S(R_1,R_2) = min_{v_i \in R_1,v_j \in R_2,(v_i,v_j) \in E} w((v_i,v_j))">
+</p>
 
 The two regions in the neighborhood are said to be most similar if:
 
-![\begin{equation}
-S(R_1,R_2) = min_{R_i \in \Omega_1} S(R_1,R_i) = min_{R_j \in \Omega_2} S(R_2,R_j)
-\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AS%28R_1%2CR_2%29+%3D+min_%7BR_i+%5Cin+%5COmega_1%7D+S%28R_1%2CR_i%29+%3D+min_%7BR_j+%5Cin+%5COmega_2%7D+S%28R_2%2CR_j%29%0A%5Cend%7Bequation%7D)
+<p align='center'><img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+S%28R_1%2CR_2%29+%3D+min_%7BR_i+%5Cin+%5COmega_1%7D+S%28R_1%2CR_i%29+%3D+min_%7BR_j+%5Cin+%5COmega_2%7D+S%28R_2%2CR_j%29" 
+alt="S(R_1,R_2) = min_{R_i \in \Omega_1} S(R_1,R_i) = min_{R_j \in \Omega_2} S(R_2,R_j)"></p>
 
 where ![\Omega_1](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5COmega_1) and ![\Omega_2](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5COmega_2) are the neighborhood sets of ![R_1](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+R_1) and ![R_2](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+R_2)
 
@@ -65,9 +67,11 @@ The consistency between the two regions is given by SPRT (Sequential Probability
 
 Then, the likelihood ratio ![\delta_i](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta_i) is given by:
 
-![\begin{equation}
-\delta_i = \log \frac{P_0(x_i|\theta_0)}{P_1(x_i|\theta_1)}, i=1,2,...,N
-\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0A%5Cdelta_i+%3D+%5Clog+%5Cfrac%7BP_0%28x_i%7C%5Ctheta_0%29%7D%7BP_1%28x_i%7C%5Ctheta_1%29%7D%2C+i%3D1%2C2%2C...%2CN%0A%5Cend%7Bequation%7D)
+<p align="center">
+    <img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cdelta_i+%3D+%5Clog+%5Cfrac%7BP_0%28x_i%7C%5Ctheta_0%29%7D%7BP_1%28x_i%7C%5Ctheta_1%29%7D%2C+i%3D1%2C2%2C...%2CN" 
+alt="\delta_i = \log \frac{P_0(x_i|\theta_0)}{P_1(x_i|\theta_1)}, i=1,2,...,N">
+</p>
 
 where _N_ is the number of tests. The overall likelihood ![\delta](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta) is obtained by summing over the ![\delta_i](https://render.githubusercontent.com/render/math?math=%5Ctextstyle+%5Cdelta_i).
 
@@ -78,18 +82,25 @@ If the delta exceeds the bounds or the number of tests are made, this ![\delta](
 
 Region merging starts from an over-segmented image. Once the initial labels are obtained, the labels are updated every pass and a final label $l_i^n$ is obtained. We get a sequence of labels $(l_i^1, … , l_i^n)$ and multiple such sequence of labels are obtained because of the uncertainty in the SPRT. The optimal sequence is obtained by minimising the objective function F which is defined as the measure of transition costs in the space of partitions. F is the sum of transition costs over all regions, then,
 
-![\begin{equation}
-F = \sum_{R_i} F_i
-\end{equation}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Bequation%7D%0AF+%3D+%5Csum_%7BR_i%7D+F_i%0A%5Cend%7Bequation%7D)
+<p align="center">
+    <img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+F+%3D+%5Csum_%7BR_i%7D+F_i" 
+alt="F = \sum_{R_i} F_i">
+</p>
 
 The solution is found using a DP approach as,
 
-![\begin{aligned}
-\text{min} F_i (l_i^0 , ... , l_i^n ) & =  \text{min}F_i (l_i^0 , l_i^{n - 1} ) + d_{n - 1, n}\\
+<p align="center">
+    <img src=
+"https://render.githubusercontent.com/render/math?math=%5Clarge+%5Cdisplaystyle+%5Cbegin%7Baligned%7D%0A%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+...+%2C+l_i%5En+%29+%26+%3D++%5Ctext%7Bmin%7DF_i+%28l_i%5E0+%2C+l_i%5E%7Bn+-+1%7D+%29+%2B+d_%7Bn-1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+l_i%5E%7Bn-2%7D+%29+%2B+d_%7Bn-+2%2Cn+-+1%7D+%2B+d_%7Bn+-+1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7B...%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D+%5Csum_%7Bk%3D0%7D%5E%7Bn-1%7D+d_%7Bk%2Ck%2B1%7D%0A%5Cend%7Baligned%7D" 
+alt="\begin{aligned}
+\text{min} F_i (l_i^0 , ... , l_i^n ) & =  \text{min}F_i (l_i^0 , l_i^{n - 1} ) + d_{n-1, n}\\
                                       & =  \text{min} F_i (l_i^0 , l_i^{n-2} ) + d_{n- 2,n - 1} + d_{n - 1, n}\\
                                       & =  \text{...}\\
                                       & = \sum_{k=0}^{n-1} d_{k,k+1}
-\end{aligned}](https://render.githubusercontent.com/render/math?math=%5Clarge+%5Ctextstyle+%5Cbegin%7Baligned%7D%0A%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+...+%2C+l_i%5En+%29+%26+%3D++%5Ctext%7Bmin%7DF_i+%28l_i%5E0+%2C+l_i%5E%7Bn+-+1%7D+%29+%2B+d_%7Bn+-+1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7Bmin%7D+F_i+%28l_i%5E0+%2C+l_i%5E%7Bn-2%7D+%29+%2B+d_%7Bn-+2%2Cn+-+1%7D+%2B+d_%7Bn+-+1%2C+n%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D++%5Ctext%7B...%7D%5C%5C%0A++++++++++++++++++++++++++++++++++++++%26+%3D+%5Csum_%7Bk%3D0%7D%5E%7Bn-1%7D+d_%7Bk%2Ck%2B1%7D%0A%5Cend%7Baligned%7D)
+\end{aligned}">
+</p>
+   
 
 From an earlier assumption, we conclude that,
 

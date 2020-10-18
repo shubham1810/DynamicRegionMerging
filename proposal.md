@@ -19,6 +19,7 @@ A vast amount of research on this topic encompasses approaches including but not
 <p align='center'>
     <img src='./img/segment.JPG'>
 </p>
+
 __Figure__ : An example of the segmentation process. We see that the first image depicts the input RGB data in which we want to apply segmentation. The second figure (middle) shows the initial over-segmented state of the input image, and the final visualization shows the result of Dynamic Region Merging Algorithm on the image. The final image shows the different labels being well separated into different groups/partitions.
 
 

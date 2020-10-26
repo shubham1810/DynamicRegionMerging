@@ -18,6 +18,7 @@ class RAG(object):
         # placeholder for nodes and edges
         self.nodes = {}
         self.edges = {}
+        self.edge_data = {}
         
         # Add padding to the label image
         labels_pad = np.pad(labels, self.padding, mode='edge')
@@ -45,6 +46,35 @@ class RAG(object):
         # Update each node and replace list with numpy array (faster processing for later)
         for ndx in self.nodes:
             self.nodes[ndx] = np.array(self.nodes[ndx])
+        
+        
+        # Compute the weights of the edges
+        # [NOTE]: For now, the method of computing the dissimilarity is w(u, v) = 1 - d(u, v)
+        # where, d(u, v) is the distance between u and v. Scaled down to (0, 1)
+        for ed in self.edges:
+            u, v = ed
+            # Check if the edge already contains a weight (or if it's reverse does)
+            if self.edges.get(ed) is not None:
+                continue
+            
+            # Compute the edge weight and update in the data
+            wt = self.get_edge_weight(u, v)
+            self.edges[(u, v)] = wt
+            self.edges[(v, u)] = wt
+    
+    
+    def get_edge_weight(self, region1, region2):
+        """
+        Compute the edge weight based on the function:
+                w(u, v) = 1 - d(u, v)
+        where, d(.,.) is the eucledian distance of the colors.
+        Normalised by 255 to keep in range (0, 1).
+        
+        [TODO]: See if positional encoding helps in the future.
+        """
+        diff = self.nodes[region1][:, None, :3] - self.nodes[region2][:, :3]
+        w = 1 - (np.sqrt(np.einsum('ijk,ijk->ij', diff, diff))/255.0)
+        return w.min()
     
     def check_region_edge(self, values):
         """
@@ -64,16 +94,18 @@ class RAG(object):
         Method to add the edge (u, v) with empty data {}.
         Return Nothing if edge already exists.
         """
-        # Check if the edge already exists
-        if (u,v) in self.edges:
+        if (u,v) in self.edges or (v, u) in self.edges or (u == v):
             return
         
         # If the nodes don't exist then add them
         self.add_node(u)
         self.add_node(v)
         
-        # Add the edge
-        self.edges[(u,v)] = {}
+        # Check if the edge and it's data exists
+        self.edges.setdefault((u, v), None)
+        self.edges.setdefault((v, u), None)
+        self.edge_data[u].append(v)
+        self.edge_data[v].append(u)
     
     def add_node(self, u):
         """
@@ -83,3 +115,4 @@ class RAG(object):
             u: node id (int)
         """
         self.nodes.setdefault(u, [])
+        self.edge_data.setdefault(u, [])

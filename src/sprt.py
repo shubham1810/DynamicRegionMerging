@@ -113,6 +113,7 @@ class SPRT(object):
 
 					n += 1
 
+					# Condition checks
 					if(n < self.N):
 					
 						if(delta >= self.A):
@@ -128,7 +129,7 @@ class SPRT(object):
 						if(delta < 0):
 							self.decision = "inconsistent"
 
-				print(ix,iy,self.decision)
+				# print(ix,iy,self.decision)
 				self.result.append([ix,iy,self.decision])
 
 

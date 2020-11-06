@@ -138,10 +138,11 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 						# print(n)
 						# print(B, delta[0][0], A)
 
-				# Condition checks
-				print(n, N)
-				print(B, delta[0][0], A)
 				
+				# print(n, N)
+				# print(B, delta[0][0], A)
+				
+				# Condition checks
 				if(n <= N):
 				
 					if(delta >= A):

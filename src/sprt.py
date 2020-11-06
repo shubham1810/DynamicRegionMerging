@@ -64,16 +64,16 @@ def compute_conditionalProbability(region1, region2, lambda1, lambda2):
 	 Some covariance matrices are singular matrices so inplace 
 	 of inverse, a pseudo inverse is computed.
 	"""
-	ex1 = np.exp(np.dot(-(s2_avg - s1_avg), np.dot(np.linalg.pinv(cov),
+	ex0 = np.exp(np.dot(-(s2_avg - s1_avg), np.dot(np.linalg.inv(cov),
 												(s2_avg - s1_avg).T)))
-	ex2 = np.exp(np.dot(-(s2_avg - s3_avg), np.dot(np.linalg.pinv(cov),
+	ex1 = np.exp(np.dot(-(s2_avg - s3_avg), np.dot(np.linalg.inv(cov),
 												(s2_avg - s3_avg).T)))
 
 	# Compute the conditional probabilities
-	p_h1 = 1 - (lambda1 * ex1)
-	p_h2 = 1 - (lambda2 * ex2)
+	p_h0 = 1 - (lambda1 * ex0)
+	p_h1 = 1 - (lambda2 * ex1)
 
-	return p_h1, p_h2
+	return p_h0, p_h1
 
 
 def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
@@ -90,8 +90,8 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 	"""
 	lambda1 = 1
 	lambda2 = 1
-	nita0 = 0.1
-	nita1 = 0.1
+	nita0 = 1.0
+	nita1 = 1.0
 
 	"""Computing the other necessary parameters. The A and B values are the upper 
 	and lower limits of the range in which delts falls.
@@ -103,11 +103,12 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 
 
 	# The Expectations, the max of which serves as the upper limit for no of tests
-	E1 = ((A * alpha) + (B * (1-alpha)))/nita0
-	E2 = ((A * (1 - beta)) + (B * beta))/nita1
-	N = max(E1, E2)
+	E0 = ((A * alpha) + (B * (1-alpha)))/nita0
+	E1 = ((A * (1 - beta)) + (B * beta))/nita1
+	N = max(E0, E1)
 	result = []
 
+	# Counters to check which condition is hit how many times, printing the values at the end
 	a,b,c,d = 0, 0, 0, 0
 
 	# Iterate over all the nodes.
@@ -121,50 +122,49 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 				delta,n = 0, 0 
 				decision = ''
 
+				# rejecting segments which have less than 2 pixels.
+				if(len(nodes[ix])>=2 and len(nodes[iy])>=2): 
+					p_h0, p_h1 = compute_conditionalProbability(nodes[ix], nodes[iy], lambda1, lambda2)
+
 				# iterating till delta lies in the range [B <= delta <= A]
 				while(delta >= B and delta <= A): 
 
-					# rejecting segments which have less than 2 pixels.
-					if(len(nodes[ix])>=2 and len(nodes[iy])>=2): 
+					# Update the evidance accumulator delta with the likelihood ratio
+					delta = delta + np.log((p_h1 * (1 - beta))/(p_h0 * (1 - alpha)))
 
-						p_h1, p_h2 = compute_conditionalProbability(nodes[ix], nodes[iy], lambda1, lambda2)
+					# Update the trial counter
+					n += 1
 
-						# Update the evidance accumulator delta with the likelihood ratio
-						delta = delta + np.log((p_h1 * (1 - beta))/(p_h2 * (1 - alpha)))
+						# print(n)
+						# print(B, delta[0][0], A)
 
-						# Update the trial counter
-						n += 1
+				# Condition checks
+				print(n, N)
+				print(B, delta[0][0], A)
+				
+				if(n <= N):
+				
+					if(delta >= A):
+						decision = "consistent"
+						a += 1
 
-						print(n)
-						print(B, delta[0][0], A)
-
-						# Condition checks
-						if(n < N):
+					if(delta <= B):
+						decision = "inconsistent"
+						b += 1
 						
-							if(delta >= A):
-								decision = "consistent"
-								a += 1
-								result.append([ix,iy,decision])
-								break
-
-							elif(delta <= B):
-								decision = "inconsistent"
-								b += 1
-								result.append([ix,iy,decision])
-								break
-
-						elif(n > N):
-							if(delta >= 0):
-								decision = "consistent"
-								c += 1
-								result.append([ix,iy,decision])
-								break
-
-							elif(delta < 0):
-								decision = "inconsistent"
-								d += 1
-								result.append([ix,iy,decision])
-								break
+				if(n > N):
+					if(delta >= 0):
+						decision = "consistent"
+						c += 1
+						
+					if(delta < 0):
+						decision = "inconsistent"
+						d += 1
+						
+				print(a,b,c,d)
+				print(decision)
+				print('-'*100)
+				result.append([ix,iy,decision])
 
 	print(a,b,c,d)
 

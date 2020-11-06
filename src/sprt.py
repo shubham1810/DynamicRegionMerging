@@ -64,9 +64,9 @@ def compute_conditionalProbability(region1, region2, lambda1, lambda2):
 	 Some covariance matrices are singular matrices so inplace 
 	 of inverse, a pseudo inverse is computed.
 	"""
-	ex0 = np.exp(np.dot(-(s2_avg - s1_avg), np.dot(np.linalg.inv(cov),
+	ex0 = np.exp(np.dot(-(s2_avg - s1_avg), np.dot(np.linalg.pinv(cov),
 												(s2_avg - s1_avg).T)))
-	ex1 = np.exp(np.dot(-(s2_avg - s3_avg), np.dot(np.linalg.inv(cov),
+	ex1 = np.exp(np.dot(-(s2_avg - s3_avg), np.dot(np.linalg.pinv(cov),
 												(s2_avg - s3_avg).T)))
 
 	# Compute the conditional probabilities
@@ -88,10 +88,10 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 	of the cues and the neta values aree used to compute the N value, the upper 
 	limit on the no of tests.
 	"""
-	lambda1 = 1
+	lambda1 = 8
 	lambda2 = 1
-	nita0 = 1.0
-	nita1 = 1.0
+	nita0 = 0.1
+	nita1 = 0.1
 
 	"""Computing the other necessary parameters. The A and B values are the upper 
 	and lower limits of the range in which delts falls.
@@ -134,13 +134,6 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 
 					# Update the trial counter
 					n += 1
-
-						# print(n)
-						# print(B, delta[0][0], A)
-
-				
-				# print(n, N)
-				# print(B, delta[0][0], A)
 				
 				# Condition checks
 				if(n <= N):
@@ -162,9 +155,6 @@ def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
 						decision = "inconsistent"
 						d += 1
 						
-				print(a,b,c,d)
-				print(decision)
-				print('-'*100)
 				result.append([ix,iy,decision])
 
 	print(a,b,c,d)

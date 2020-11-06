@@ -1,135 +1,173 @@
 import numpy as np
 
-class SPRT(object):
-	def __init__(self, nodes, alpha=0.05, beta=0.05, h0=0, h1=1):
 
-		self.nodes = nodes
-		self.lambda1 = 1
-		self.lambda2 = 1
-		self.alpha = alpha
-		self.beta = beta
-		self.h0 = h0
-		self.h1 = h1
-		self.N = 2
-		# Necessary arguments
-		self.A = np.log((1 - self.beta)/self.alpha)
-		self.B = np.log(self.beta/(1 - self.alpha))
-		self.decision = ''
-		self.result = []
+def sample_from_region(region, n_points):
+	"""
+	Takes a region and number of points to be sampled, 
+	returns a sampled number of points from the region.
+	"""
+	ind = np.random.permutation(range(region.shape[0]))[:n_points]
+	return region[ind,:3]
 
-		#Calling test function
-		self.SPRT_test()
+def compute_averageColor(sample):
+	"""
+	Takes a sample region and returns the average color 
+	of all the pixels belonging to the sample region
+	"""
+	mean = sample.mean(axis=0).reshape((1,sample.shape[1]))
+	return mean
 
-	def sample_from_region(self,region):
-		ind = np.random.choice(range(len(region)),(len(region)//2))
-		reg = []
-		for i in ind:
-			reg.append(region[i][:3])
-		return np.array(reg)
+def compute_regionCovariance(sample1, sample2):
+	"""
+	Takes 2 sample regions and returns the covariance
+	of the stacked region over their feature dimension.
+	"""
+	m = np.vstack((sample1,sample2))
+	cov = np.cov(m.T)
+	return cov
 
+def compute_conditionalProbability(region1, region2, lambda1, lambda2):
+	"""
+	Takes 2 regions and computes the following:
+	1. Samples half of the minimum no of pixels among both the regions.
+	2. Create a new region by taking a UNION of the 2 regions and
+		samples an equal number of pixels from the new region.
+	3. Computes the average color of the 3 sampled regions.
+	4. Computes the covariance of the sample regions across color dimensions
+	5. Computes the conditional probability to estimate the distribution of
+		color cues by fitting a gaussian distribution.
 
-	def compute_averageColor(self,sample):
-		mean_img = sample.mean(axis=1).reshape((sample.shape[0],1))
-		return mean_img
- 
-	def compute_regionCovariance(self,sample1, sample2):
-		
-		m = np.hstack((sample1,sample2))
-		cov = np.cov(m)
-		return cov
+	Returns the computed conditional probability distributions.
+	"""
 
-	def compute_conditionalProbability(self, region1, region2):
-		sample1 = self.sample_from_region(region1) 
-		sample2 = self.sample_from_region(region2)
+	# The minimum no of pixels among both regions.
+	l = min(region1.shape[0]//2,region2.shape[0]//2)
 
-		region3 = np.concatenate((region1, region2), axis=0)
-		sample3 = self.sample_from_region(region3)
+	# Sample from the regions
+	sample1 = sample_from_region(region1, l) 
+	sample2 = sample_from_region(region2, l)
 
-
-		l = max(sample1.shape[0],sample2.shape[0])
+	# Create new region as concatination of the 2 regions and sample from it.
+	region3 = np.concatenate((region1, region2), axis=0)
+	sample3 = sample_from_region(region3, l)
 	
-		if(sample1.shape[0] != l):
-			pad = np.zeros(((l - sample1.shape[0]),3))
-			sample1 = np.concatenate((sample1, pad), axis=0)
+	# Compute average color of all regions.
+	s1_avg = compute_averageColor(sample1)
+	s2_avg = compute_averageColor(sample2)
+	s3_avg = compute_averageColor(sample3)
+	
+	# Compute the covariance of regions 
+	cov = compute_regionCovariance(sample1,sample2)
 
-		elif(sample2.shape[0] != l):
-			pad = np.zeros(((l - sample2.shape[0]),3))
-			sample2 = np.concatenate((sample2, pad), axis=0)
+	"""
+	 Compute the exponential coefficients.
+	 Some covariance matrices are singular matrices so inplace 
+	 of inverse, a pseudo inverse is computed.
+	"""
+	ex1 = np.exp(np.dot(-(s2_avg - s1_avg), np.dot(np.linalg.pinv(cov),
+												(s2_avg - s1_avg).T)))
+	ex2 = np.exp(np.dot(-(s2_avg - s3_avg), np.dot(np.linalg.pinv(cov),
+												(s2_avg - s3_avg).T)))
 
-		# elif(sample3.shape[0] != l):
-		# 	pad = np.zeros(((l - sample3.shape[0]),3))
-		sample3 = sample3[:l]
-		
-		s1_avg = self.compute_averageColor(sample1)
-		s2_avg = self.compute_averageColor(sample2)
-		s3_avg = self.compute_averageColor(sample3)
-		
-		cov = self.compute_regionCovariance(sample1,sample2)
+	# Compute the conditional probabilities
+	p_h1 = 1 - (lambda1 * ex1)
+	p_h2 = 1 - (lambda2 * ex2)
 
-
-		ex1 = np.exp(np.dot(-(s2_avg - s1_avg).T, np.dot(np.linalg.pinv(cov), (s2_avg - s1_avg))))
-		ex2 = np.exp(np.dot(-(s2_avg - s3_avg).T, np.dot(np.linalg.pinv(cov), (s2_avg - s3_avg))))
-
-		p_h1 = 1 - (self.lambda1 * ex1)
-		p_h2 = 1 - (self.lambda2 * ex2)
-
-		return p_h1, p_h2
-
-	def calc_Expectation(a, n):
-		pass
-
-		# prb = 1 / n 
-		  
-		# s = 0
-		# for i in range(0, n): 
-		#     s += (a[i] * prb)  
-			  
-		# return float(sum) 
+	return p_h1, p_h2
 
 
-	def SPRT_test(self):
+def SPRT(nodes, edge_data, alpha=0.05, beta=0.05, h0=0, h1=1):
+	"""
+	Main function that performs the SPRT test between all the nodes in the graph
+	and their neighbour nodes.
+	"""
 
-		keys = sorted(list(self.nodes.keys()))
+	"""
+	Fixing essential parameters values. The lambda values are the scaling factor
+	for the exponential coefficients in the conditional probability estimation
+	of the cues and the neta values aree used to compute the N value, the upper 
+	limit on the no of tests.
+	"""
+	lambda1 = 1
+	lambda2 = 1
+	nita0 = 0.1
+	nita1 = 0.1
 
-		for ix in range(1,len(keys)+1):
-			for iy in range(ix+1,len(keys)+1):
-				# if(self.nodes[ix] == self.nodes[iy]):
-				# 	continue
+	"""Computing the other necessary parameters. The A and B values are the upper 
+	and lower limits of the range in which delts falls.
+	""" 
+	A = np.log((1 - beta)/alpha)
+	B = np.log(beta/(1 - alpha))
 
-				# else:
-				# print(ix, iy)
-				delta,n = 0, 0
-				delta_ar = []
+	result = [] # stores the final results.
 
-				# print(delta, self.A, self.B)
 
-				while(delta >= self.B and delta <= self.A):
-					# print(delta)
+	# The Expectations, the max of which serves as the upper limit for no of tests
+	E1 = ((A * alpha) + (B * (1-alpha)))/nita0
+	E2 = ((A * (1 - beta)) + (B * beta))/nita1
+	N = max(E1, E2)
+	result = []
 
-					p_h1, p_h2 = self.compute_conditionalProbability(self.nodes[ix],self.nodes[iy])
+	a,b,c,d = 0, 0, 0, 0
 
-					delta = delta + np.log((p_h1*(1-self.beta))/(p_h2*(1-self.alpha)))
-					delta_ar.append(delta)
+	# Iterate over all the nodes.
+	for ix in sorted(nodes.keys()):
+		for iy in edge_data[ix]:
+			
+			# Not iterating over the same pair again.
+			if iy > ix:
 
-					n += 1
+				# initializing the delta and counter to 0
+				delta,n = 0, 0 
+				decision = ''
 
-					# Condition checks
-					if(n < self.N):
-					
-						if(delta >= self.A):
-							self.decision = "consistent"
+				# iterating till delta lies in the range [B <= delta <= A]
+				while(delta >= B and delta <= A): 
 
-						if(delta <= self.B):
-							self.decision = "inconsistent"
+					# rejecting segments which have less than 2 pixels.
+					if(len(nodes[ix])>=2 and len(nodes[iy])>=2): 
 
-					if(n > self.N):
-						if(delta >= 0):
-							self.decision = "consistent"
+						p_h1, p_h2 = compute_conditionalProbability(nodes[ix], nodes[iy], lambda1, lambda2)
 
-						if(delta < 0):
-							self.decision = "inconsistent"
+						# Update the evidance accumulator delta with the likelihood ratio
+						delta = delta + np.log((p_h1 * (1 - beta))/(p_h2 * (1 - alpha)))
 
-				# print(ix,iy,self.decision)
-				self.result.append([ix,iy,self.decision])
+						# Update the trial counter
+						n += 1
+
+						print(n)
+						print(B, delta[0][0], A)
+
+						# Condition checks
+						if(n < N):
+						
+							if(delta >= A):
+								decision = "consistent"
+								a += 1
+								result.append([ix,iy,decision])
+								break
+
+							elif(delta <= B):
+								decision = "inconsistent"
+								b += 1
+								result.append([ix,iy,decision])
+								break
+
+						elif(n > N):
+							if(delta >= 0):
+								decision = "consistent"
+								c += 1
+								result.append([ix,iy,decision])
+								break
+
+							elif(delta < 0):
+								decision = "inconsistent"
+								d += 1
+								result.append([ix,iy,decision])
+								break
+
+	print(a,b,c,d)
+
+	return result
 
 

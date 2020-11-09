@@ -41,7 +41,19 @@ def neighbourhood(image, x, y):
         if (len(keys) == 1): # Part of another region
             return keys[0]
         else: # Watershed
-            return 0
+            return 0   
+
+def get_val(image,x,y):
+	l = []
+	for i in range(-1, 2):
+		for j in range(-1, 2):
+			if (x+i < 0 or y+j < 0):
+				continue
+			if(x+i >= image.shape[0] or y+j >= image.shape[1]):
+				continue
+			elif(image[x+i,y+j]!=0):
+				l.append(image[x+i][y+j])
+	return min(l)
 
 def watershed_segmentation(image):
     # Create a list of pixel intensities along with their coordinates
@@ -61,8 +73,8 @@ def watershed_segmentation(image):
     region_number = 0
     for i in range(len(intensity_list)):
         # Print iteration number in terminal for clarity
-        sys.stdout.write("\rPixel {} of {}...".format(i, len(intensity_list)))
-        sys.stdout.flush()
+        # sys.stdout.write("\rPixel {} of {}...".format(i, len(intensity_list)))
+        # sys.stdout.flush()
 
         # Get the pixel intensity and the x,y coordinates
         intensity = intensity_list[i][0]
@@ -80,8 +92,11 @@ def watershed_segmentation(image):
             segmented_image[x][y] = 0
         else: # Part of another region
             segmented_image[x][y] = region_status
-             
-    # Return the segmented image
+
+    for i in range(segmented_image.shape[0]):
+    	for j in range(segmented_image.shape[1]):
+    		if(segmented_image[i,j]==0):
+    			segmented_image[i,j] = get_val(segmented_image,i,j)
     return segmented_image
 
 

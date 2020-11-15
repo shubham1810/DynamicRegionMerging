@@ -44,16 +44,39 @@ def neighbourhood(image, x, y):
             return 0   
 
 def get_val(image,x,y):
-	l = []
+	# l = []
+	# for i in range(-1, 2):
+	# 	for j in range(-1, 2):
+	# 		if (x+i < 0 or y+j < 0):
+	# 			continue
+	# 		if(x+i >= image.shape[0] or y+j >= image.shape[1]):
+	# 			continue
+	# 		elif(image[x+i,y+j]!=0):
+	# 			l.append(image[x+i][y+j])
+
+	neighbour_region_numbers = {}
 	for i in range(-1, 2):
 		for j in range(-1, 2):
-			if (x+i < 0 or y+j < 0):
+			if (i == 0 and j == 0):
 				continue
-			if(x+i >= image.shape[0] or y+j >= image.shape[1]):
+			if (x+i < 0 or y+j < 0): # If coordinates out of image range, skip
 				continue
-			elif(image[x+i,y+j]!=0):
-				l.append(image[x+i][y+j])
-	return min(l)
+			if (x+i >= image.shape[0] or y+j >= image.shape[1]): # If coordinates out of image range, skip
+				continue
+			if (neighbour_region_numbers.get(image[x+i][y+j]) == None):
+				neighbour_region_numbers[image[x+i][y+j]] = 1 # Create entry in dictionary if not already present
+			else:
+				neighbour_region_numbers[image[x+i][y+j]] += 1 # Increase count in dictionary if already present
+
+	# Remove the key - 0 if exists
+	if (neighbour_region_numbers.get(0) != None):
+		del neighbour_region_numbers[0]
+
+	key_list = list(neighbour_region_numbers.keys()) 
+	val_list = list(neighbour_region_numbers.values()) 	
+
+	val = key_list[val_list.index(max(neighbour_region_numbers.values()))]
+	return  val
 
 def watershed_segmentation(image):
     # Create a list of pixel intensities along with their coordinates

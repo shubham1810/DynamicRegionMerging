@@ -3,13 +3,15 @@ from .rag import RAG
 from .sprt import *
 from skimage import data, segmentation
 import datetime
+import cv2
+import tqdm
 
 
 class RegionMerging:
-    def __init__(self, img, alpha=0.05, beta=0.05, lambda1=1.0, lambda2=0.5):
+    def __init__(self, img, labels, alpha=0.05, beta=0.05, lambda1=1.0, lambda2=0.5):
         # we keep a copy of the image and the initial labels
         self.img = img.copy()
-        self.labels = segmentation.slic(img, compactness=30, n_segments=100, start_label=1)
+        self.labels = labels.copy()
         
         # Save parameters
         self.alpha = alpha
@@ -29,11 +31,9 @@ class RegionMerging:
         max_iters, or until the segmented image stays the same.
         """
         
-        for iteration in range(max_iters):
-            # Compute the merged regions. The function also tells whether we need to stop the process or not
-            if self.run_merging_pass():
-                print("No more regions to merge. Stopping")
-                break
+        for iteration in tqdm.tqdm(range(max_iters)):
+            # Compute the merged regions
+            self.run_merging_pass()
             
             # Update the RAG
             self.make_rag()
@@ -113,17 +113,13 @@ class RegionMerging:
         
         # Apply merging by updating the label map
         lbs = self.labels.copy()
-        # Define a flag to stop/continue the process
-        stop_process = True
-
+        
         for res in merges:
             reg1, reg2, can_merge = res
             if can_merge:
-                stop_process = False
                 lbs[lbs == reg2] = reg1
-
+        
         self.labels = lbs.copy()
-        return stop_process
         
     def get_labels(self):
         return self.labels

@@ -50,3 +50,16 @@ def visualize_rag(img, labels, graph):
                 plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     plt.show()
+    
+def quantize_image(image, labels):
+    """
+    Get a pseudo-quantized version of the image
+    """
+    new_img = np.zeros_like(image)
+    for lx in np.unique(labels):
+        mask = (labels == lx)[:, :, None]
+        vals = mask*image
+        col = vals.reshape((-1, 3)).sum(0) / mask.reshape((-1,)).sum(0)
+        new_img += (mask*col).astype(np.uint8)
+
+    return new_img

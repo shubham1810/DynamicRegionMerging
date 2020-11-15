@@ -70,47 +70,28 @@ def compute_conditionalProbability(region1, region2, lambda1, lambda2):
     return p_h0, p_h1
 
 
-def sprt_test(node1, node2):
+def sprt_test(node1, node2, alpha=0.05, beta=0.05, h0=0.0, h1=1.0, lambda1=1.0, lambda2=1.0, eta0=0.1, eta1=0.1):
     """
     Take data from two nodes, and merge them if they pass the SPRT test.
     
     Args:
         node1: points in the first node
         node2: ponits in the second node
-    """
-    merge = False
     
-    """
-    Fixing essential parameters values. The lambda values are the scaling factor
-    for the exponential coefficients in the conditional probability estimation
-    of the cues and the neta values aree used to compute the N value, the upper 
-    limit on the no of tests.
-    """
-    alpha=0.05
-    beta=0.05
-    h0=0
-    h1=1
-    lambda1 = 1
-    lambda2 = 1
-    eta0 = 0.1
-    eta1 = 0.1
-
-    """Computing the other necessary parameters. The A and B values are the upper 
+    The lambda values are the scaling factor for the exponential coefficients in
+    the conditional probability estimation of the cues and the eta values are 
+    used to compute the N value, the upper limit on the no of tests.
+    
+    Computing the other necessary parameters. The A and B values are the upper 
     and lower limits of the range in which delts falls.
     """ 
     A = np.log((1 - beta)/alpha)
     B = np.log(beta/(1 - alpha))
-
+    
     # The Expectations, the max of which serves as the upper limit for no of tests
     E0 = ((A * alpha) + (B * (1-alpha)))/eta0
     E1 = ((A * (1 - beta)) + (B * beta))/eta1
     N = max(E0, E1)
-
-    # Placeholder storage for results
-    result = []
-
-    # Counters to check which condition is hit how many times, printing the values at the end
-    a,b,c,d = 0, 0, 0, 0
 
     # Initialize delta and counter values
     delta = 0.0
@@ -118,7 +99,7 @@ def sprt_test(node1, node2):
     
     # Check if number of pixels are enough or not
     if node1.shape[0] <= 2 or node2.shape[0] <= 2:
-        return merge
+        return True
     
     # Begin the SPRT test (sample data and update delta sequentially)
     while delta >= B and delta <= A:

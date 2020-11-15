@@ -18,7 +18,8 @@ def visualize_rag(img, labels, graph):
     # Iterate over all regions/nodes
     for ix in range(1, max(graph.edge_data)+1):
         curr = ix
-        for iy in graph.edge_data[ix]:
+        graph.edge_data
+        for iy in graph.edge_data.get(ix, []):
             # Don't repeat lines for plots
             if iy > ix:
                 region1_center = graph.nodes[ix][:, -2:].mean(0)
@@ -29,14 +30,14 @@ def visualize_rag(img, labels, graph):
 
                 x_coords = [region1_center[0], region2_center[0]]
                 y_coords = [region1_center[1], region2_center[1]]
-                plt.plot(y_coords, x_coords, 'k-o', linewidth=5*lw)
+                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     # Same process for the segmented image. Shows better graphs
     plt.subplot(1, 2, 2)
     plt.imshow(labels)
     for ix in range(1, max(graph.edge_data)+1):
         curr = ix
-        for iy in graph.edge_data[ix]:
+        for iy in graph.edge_data.get(ix, []):
             if iy > ix:
                 region1_center = graph.nodes[ix][:, -2:].mean(0)
                 region2_center = graph.nodes[iy][:, -2:].mean(0)
@@ -46,6 +47,6 @@ def visualize_rag(img, labels, graph):
                 # x_coords = [400-region1_center[0], 400-region2_center[0]]
                 x_coords = [region1_center[0], region2_center[0]]
                 y_coords = [region1_center[1], region2_center[1]]
-                plt.plot(y_coords, x_coords, 'k-o', linewidth=5*lw)
+                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     plt.show()

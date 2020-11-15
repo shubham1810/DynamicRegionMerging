@@ -63,7 +63,7 @@ class RAG(object):
             self.edges[(v, u)] = wt
     
     
-    def get_edge_weight(self, region1, region2):
+    def get_old_edge_weight(self, region1, region2):
         """
         Compute the edge weight based on the function:
                 w(u, v) = 1 - d(u, v)
@@ -75,6 +75,14 @@ class RAG(object):
         diff = self.nodes[region1][:, None, :3] - self.nodes[region2][:, :3]
         w = 1 - (np.sqrt(np.einsum('ijk,ijk->ij', diff, diff))/255.0)
         return w.min()
+    
+    def get_edge_weight(self, region1, region2):
+        """
+        Compite the edge weight based on exp of mean values
+        """
+        diff = (self.nodes[region1][:, :3].mean(0) - self.nodes[region2][:, :3].mean(0))/255.0
+        dist = np.sum(diff**2)
+        return np.exp(dist)
     
     def check_region_edge(self, values):
         """

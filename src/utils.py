@@ -8,7 +8,7 @@ def visualize_rag(img, labels, graph):
     Function to visualize RAG over the actual image and
     the segmented image.
     """
-    img1 = quantize_image(img1, labels)
+    img1 = quantize_image(img, labels)
     # Create the plot placeholder
     plt.figure(0, figsize=(30, 10))
     
@@ -60,7 +60,7 @@ def visualize_nng(img, labels, graph):
     Function to visualize RAG over the actual image and
     the segmented image.
     """
-    img1 = quantize_image(img1, labels)
+    img1 = quantize_image(img, labels)
     # Create the plot placeholder
     plt.figure(0, figsize=(30, 10))
     
@@ -74,36 +74,34 @@ def visualize_nng(img, labels, graph):
     # Iterate over all regions/nodes
     for ix in range(1, max(graph.edge_data)+1):
         curr = ix
-        graph.edge_data
-        for iy in graph.edge_data.get(ix, []):
-            # Don't repeat lines for plots
-            if iy > ix:
-                region1_center = graph.nodes[ix][:, -2:].mean(0)
-                region2_center = graph.nodes[iy][:, -2:].mean(0)
+        iy = graph.edge_data.get(ix, None)
+        if not (iy is None):
+            region1_center = graph.nodes[ix][:, -2:].mean(0)
+            region2_center = graph.nodes[iy][:, -2:].mean(0)
 
-                # Line width related to the weight of the edge
-                lw = graph.edges[(ix, iy)]
+            # Line width related to the weight of the edge
+            lw = graph.edges[(ix, iy)]
 
-                x_coords = [region1_center[0], region2_center[0]]
-                y_coords = [region1_center[1], region2_center[1]]
-                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
+            x_coords = [region1_center[0], region2_center[0]]
+            y_coords = [region1_center[1], region2_center[1]]
+            plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     # Same process for the segmented image. Shows better graphs
-    plt.subplot(1, 2, 2)
+    plt.subplot(1, 3, 3)
     plt.imshow(labels)
     for ix in range(1, max(graph.edge_data)+1):
         curr = ix
-        for iy in graph.edge_data.get(ix, []):
-            if iy > ix:
-                region1_center = graph.nodes[ix][:, -2:].mean(0)
-                region2_center = graph.nodes[iy][:, -2:].mean(0)
+        iy = graph.edge_data.get(ix, None)
+        if not (iy is None):
+            region1_center = graph.nodes[ix][:, -2:].mean(0)
+            region2_center = graph.nodes[iy][:, -2:].mean(0)
 
-                lw = graph.edges[(ix, iy)]
+            lw = graph.edges[(ix, iy)]
 
-                # x_coords = [400-region1_center[0], 400-region2_center[0]]
-                x_coords = [region1_center[0], region2_center[0]]
-                y_coords = [region1_center[1], region2_center[1]]
-                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
+            # x_coords = [400-region1_center[0], 400-region2_center[0]]
+            x_coords = [region1_center[0], region2_center[0]]
+            y_coords = [region1_center[1], region2_center[1]]
+            plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     plt.show()
 

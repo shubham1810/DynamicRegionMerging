@@ -166,7 +166,8 @@ class NNGRegionMerging:
         
         for iteration in tqdm.tqdm(range(max_iters)):
             # Compute the merged regions
-            self.run_merging_pass()
+            if self.run_merging_pass():
+                break
             
             # Update the RAG
             self.make_rag()
@@ -213,12 +214,15 @@ class NNGRegionMerging:
         # Apply merging by updating the label map
         lbs = self.labels.copy()
         
+        stop_running = True
         for res in merges:
             reg1, reg2, can_merge = res
             if can_merge:
+                stop_running = False
                 lbs[lbs == reg2] = reg1
         
         self.labels = lbs.copy()
+        return stop_running
         
     def get_labels(self):
         return self.labels

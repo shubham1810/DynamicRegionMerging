@@ -8,12 +8,68 @@ def visualize_rag(img, labels, graph):
     Function to visualize RAG over the actual image and
     the segmented image.
     """
+    img1 = quantize_image(img1, labels)
     # Create the plot placeholder
-    plt.figure(0, figsize=(20, 10))
+    plt.figure(0, figsize=(30, 10))
     
-    plt.subplot(1, 2, 1)
+    plt.subplot(1, 3, 1)
     # Plot the image first
     plt.imshow(img)
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(img1)
+
+    # Iterate over all regions/nodes
+    for ix in range(1, max(graph.edge_data)+1):
+        curr = ix
+        # graph.edge_data
+        for iy in graph.edge_data.get(ix, []):
+            # Don't repeat lines for plots
+            if iy > ix:
+                region1_center = graph.nodes[ix][:, -2:].mean(0)
+                region2_center = graph.nodes[iy][:, -2:].mean(0)
+
+                # Line width related to the weight of the edge
+                lw = graph.edges[(ix, iy)]
+
+                x_coords = [region1_center[0], region2_center[0]]
+                y_coords = [region1_center[1], region2_center[1]]
+                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
+    
+    # Same process for the segmented image. Shows better graphs
+    plt.subplot(1, 3, 3)
+    plt.imshow(labels)
+    for ix in range(1, max(graph.edge_data)+1):
+        curr = ix
+        for iy in graph.edge_data.get(ix, []):
+            if iy > ix:
+                region1_center = graph.nodes[ix][:, -2:].mean(0)
+                region2_center = graph.nodes[iy][:, -2:].mean(0)
+
+                lw = graph.edges[(ix, iy)]
+
+                # x_coords = [400-region1_center[0], 400-region2_center[0]]
+                x_coords = [region1_center[0], region2_center[0]]
+                y_coords = [region1_center[1], region2_center[1]]
+                plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
+    
+    plt.show()
+
+def visualize_nng(img, labels, graph):
+    """
+    Function to visualize RAG over the actual image and
+    the segmented image.
+    """
+    img1 = quantize_image(img1, labels)
+    # Create the plot placeholder
+    plt.figure(0, figsize=(30, 10))
+    
+    plt.subplot(1, 3, 1)
+    # Plot the image first
+    plt.imshow(img)
+    
+    plt.subplot(1, 3, 2)
+    plt.imshow(img1)
 
     # Iterate over all regions/nodes
     for ix in range(1, max(graph.edge_data)+1):
@@ -50,7 +106,7 @@ def visualize_rag(img, labels, graph):
                 plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
     plt.show()
-    
+
 def quantize_image(image, labels):
     """
     Get a pseudo-quantized version of the image

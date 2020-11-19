@@ -71,7 +71,7 @@ argparse
 
 ### Data
 
-Although the code in this repository does not require any specific dataset, we conducted some experiments on the [Berkeley Segmentation Dataset](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/). More specificaally, we ran our method over some of the images from the test set. The dataset can be downloaded by following the instructions from the website or it can be downloaded from our [google drive link](#).
+Although the code in this repository does not require any specific dataset, we conducted some experiments on the [Berkeley Segmentation Dataset](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/). More specificaally, we ran our method over some of the images from the test set. The dataset can be downloaded by following the instructions from the website or it can be downloaded from our [google drive link](https://drive.google.com/drive/folders/1ZywSRfG5_oo5HiULykSkTvaW5sCRyoId?usp=sharing).
 
 The images can be put in any location, the only requirement is that the path to the image for testing should be correct, as would be discussed below.
 

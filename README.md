@@ -89,6 +89,29 @@ For more information on the possible parameters, we can also check the help flag
 
 ```
 python demo.py --help
+
+usage: demo.py [-h] [--input_path INPUT_PATH] [--output OUTPUT] [--watershed]
+               [--lambda1 LAMBDA1] [--lambda2 LAMBDA2] [--alpha ALPHA]
+               [--beta BETA] [--visualize] [--max_iters MAX_ITERS]
+
+Segmentation parameters Parser. Pass the parameters following instructions
+given below to run the demo experiment.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_path INPUT_PATH
+                        Path to image for processing
+  --output OUTPUT       Path to folder for storing output
+  --watershed           Whether to use watershed for initial segmentation
+  --lambda1 LAMBDA1     Value for Lambda1 parameter
+  --lambda2 LAMBDA2     Value for Lambda2 parameter
+  --alpha ALPHA         Parameter value for alpha
+  --beta BETA           Parameter value for beta
+  --visualize           Visualize the outputs of the algorithm
+  --max_iters MAX_ITERS
+                        Max iterations for the Region merging loop
 ```
 
-As shown above, the parameters listed in the help menu can be altered via the command line. We now show some examples of the output when we run the demo with variations in the values as stated above. For a more detailed report and analysis, we recommend to look into the presentation [here](/path/to/document).
+As shown above, the parameters listed in the help menu can be altered via the command line. We now show some examples of the output when we run the demo with variations in the values as stated above. For a more detailed report and analysis, we recommend to look into the presentation [here](./documents/DIP_presentation.pdf).
+
+

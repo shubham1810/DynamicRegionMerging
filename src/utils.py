@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-def visualize_rag(img, labels, graph):
+def visualize_rag(img, labels, graph, method, time, path):
     """
     Function to visualize RAG over the actual image and
     the segmented image.
@@ -52,10 +52,15 @@ def visualize_rag(img, labels, graph):
                 x_coords = [region1_center[0], region2_center[0]]
                 y_coords = [region1_center[1], region2_center[1]]
                 plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
+
+                # method = 'rag', time = 'initial', path = save_path
+
+    plt.savefig(path+'/{}_{}.png'.format(time,method))
     
     plt.show()
+    return img1
 
-def visualize_nng(img, labels, graph):
+def visualize_nng(img, labels, graph, method, time, path):
     """
     Function to visualize RAG over the actual image and
     the segmented image.
@@ -103,7 +108,9 @@ def visualize_nng(img, labels, graph):
             y_coords = [region1_center[1], region2_center[1]]
             plt.plot(y_coords, x_coords, 'k-o', linewidth=1*lw)
     
+    plt.savefig(path+'/{}_{}.png'.format(time,method))
     plt.show()
+    return img1
 
 def quantize_image(image, labels):
     """
